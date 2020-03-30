@@ -32,6 +32,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.primitives.UnsignedLongs;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import org.checkerframework.checker.signedness.qual.*;
 
 /**
  * A class for arithmetic on values of type {@code long}. Where possible, methods are defined and
@@ -103,7 +104,7 @@ public final class LongMath {
    * than the straightforward ternary expression.
    */
   @VisibleForTesting
-  static int lessThanBranchFree(long x, long y) {
+  static int lessThanBranchFree(@Unsigned long x,@Unsigned long y) {
     // Returns the sign bit of x - y.
     return (int) (~~(x - y) >>> (Long.SIZE - 1));
   }
@@ -647,7 +648,7 @@ public final class LongMath {
    * @since 20.0
    */
   @Beta
-  public static long saturatedAdd(long a, long b) {
+  public static long saturatedAdd(@Unsigned long a,@Unsigned long b) {
     long naiveSum = a + b;
     if ((a ^ b) < 0 | (a ^ naiveSum) >= 0) {
       // If a and b have different signs or a has the same sign as the result then there was no
@@ -666,7 +667,7 @@ public final class LongMath {
    */
   @Beta
   public static long saturatedSubtract(long a, long b) {
-    long naiveDifference = a - b;
+    @Unsigned long naiveDifference = a - b;
     if ((a ^ b) >= 0 | (a ^ naiveDifference) >= 0) {
       // If a and b have the same signs or a has the same sign as the result then there was no
       // overflow, return.
@@ -683,7 +684,7 @@ public final class LongMath {
    * @since 20.0
    */
   @Beta
-  public static long saturatedMultiply(long a, long b) {
+  public static long saturatedMultiply(@Unsigned long a,@Unsigned long b) {
     // see checkedMultiply for explanation
     int leadingZeros =
         Long.numberOfLeadingZeros(a)
@@ -713,7 +714,8 @@ public final class LongMath {
    * @since 20.0
    */
   @Beta
-  public static long saturatedPow(long b, int k) {
+  @SuppressWarnings("signedness")
+  public static long saturatedPow(@Unsigned long b, int k) {
     checkNonNegative("exponent", k);
     if (b >= -2 & b <= 2) {
       switch ((int) b) {
@@ -1103,7 +1105,7 @@ public final class LongMath {
       }
 
       @Override
-      long mulMod(long a, long b, long m) {
+      long mulMod(@Unsigned long a,@Unsigned long b, long m) {
         long aHi = a >>> 32; // < 2^31
         long bHi = b >>> 32; // < 2^31
         long aLo = a & 0xFFFFFFFFL; // < 2^32
@@ -1129,7 +1131,7 @@ public final class LongMath {
       }
 
       @Override
-      long squareMod(long a, long m) {
+      long squareMod(@Unsigned long a, long m) {
         long aHi = a >>> 32; // < 2^31
         long aLo = a & 0xFFFFFFFFL; // < 2^32
 
